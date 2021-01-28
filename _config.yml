@@ -79,6 +79,10 @@ default_badges:
 html_escape:
   description: false
 
+# options for jekyll-scholar, e.g. change citation style
+scholar:
+  style: ieee
+
 # Everything below here should be left alone. Modifications may break fastpages
 future: true
 theme: minima
@@ -95,6 +99,7 @@ plugins:
   - jekyll-paginate
   - jekyll-sitemap
   - jemoji
+  - jekyll-scholar
 
 # See https://jekyllrb.com/docs/pagination/
 # For pagination to work, you cannot have index.md at the root of your repo, instead you must rename this file to index.html
