@@ -6,8 +6,8 @@
 # https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
 # https://learnxinyminutes.com/docs/yaml/
 
-title: fastpages
-description: An easy to use blogging platform with support for Jupyter Notebooks.
+title: LibreCV
+description: The organisation to empower the Computer Vision and Machine Learning community.
 github_username: LibreCV
 # you can comment the below line out if your repo name is not different than your baseurl
 github_repo: "blog"
@@ -39,8 +39,8 @@ baseurl: "/blog" # the subpath of your site, e.g. "/blog".
 # Github and twitter are optional:
 minima:
   social_links:
-    twitter: fastdotai
-    github: fastai
+    twitter: cv_libre
+    github: librecv
 
 # Set this to true to get LaTeX math equation support
 use_math: 
@@ -79,9 +79,14 @@ default_badges:
 html_escape:
   description: false
 
+# options for jekyll-scholar, e.g. change citation style
+scholar:
+  style: ieee
+
 # Everything below here should be left alone. Modifications may break fastpages
 future: true
 theme: minima
+
 plugins:
   - jekyll-feed
   - jekyll-gist
@@ -94,6 +99,7 @@ plugins:
   - jekyll-paginate
   - jekyll-sitemap
   - jemoji
+  - jekyll-scholar
 
 # See https://jekyllrb.com/docs/pagination/
 # For pagination to work, you cannot have index.md at the root of your repo, instead you must rename this file to index.html
