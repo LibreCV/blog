@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Deep Learning Experiments with Task Spooler | LibreCV</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Deep Learning Experiments with Task Spooler" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A Unix Spooler with GPU support" />
+<meta property="og:description" content="A Unix Spooler with GPU support" />
+<link rel="canonical" href="https://librecv.github.io/blog/spooler/task%20manager/deep%20learning/2021/02/09/task-spooler.html" />
+<meta property="og:url" content="https://librecv.github.io/blog/spooler/task%20manager/deep%20learning/2021/02/09/task-spooler.html" />
+<meta property="og:site_name" content="LibreCV" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-02-09T00:00:00-06:00" />
+<script type="application/ld+json">
+{"url":"https://librecv.github.io/blog/spooler/task%20manager/deep%20learning/2021/02/09/task-spooler.html","@type":"BlogPosting","headline":"Deep Learning Experiments with Task Spooler","dateModified":"2021-02-09T00:00:00-06:00","datePublished":"2021-02-09T00:00:00-06:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://librecv.github.io/blog/spooler/task%20manager/deep%20learning/2021/02/09/task-spooler.html"},"description":"A Unix Spooler with GPU support","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://librecv.github.io/blog/feed.xml" title="LibreCV" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">LibreCV</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Deep Learning Experiments with Task Spooler</h1><p class="page-description">A Unix Spooler with GPU support</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-02-09T00:00:00-06:00" itemprop="datePublished">
+        Feb 9, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      14 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#spooler">spooler</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#task manager">task manager</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#deep learning">deep learning</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/LibreCV/blog/tree/master/_notebooks/2021-02-09-task-spooler.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/blog/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/LibreCV/blog/master?filepath=_notebooks%2F2021-02-09-task-spooler.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/blog/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/LibreCV/blog/blob/master/_notebooks/2021-02-09-task-spooler.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/blog/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-02-09-task-spooler.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction"> </a></h2><p>Task Spooler was originally developed by Lluis Batlle i Rossell but is no longer maintained.
+The branch introduced here is a <a href="https://github.com/justanhduc/task-spooler">fork</a> of the original program with more features including GPU support.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Installation">Installation<a class="anchor-link" href="#Installation"> </a></h2><p>First, you can clone Task Spooler from Github.
+Optionally, you can choose a different version by checking out another tag.
+In this tutorial, I will use the latest version on <code>master</code>.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%capture</span>
+<span class="err">!</span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">justanhduc</span><span class="o">/</span><span class="n">task</span><span class="o">-</span><span class="n">spooler</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, you need to create a <code>CUDA_HOME</code> environment variable to point to the CUDA root directory.
+Then, you can execute the given install script.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span><span class="nb">cd</span> task-spooler/ <span class="o">&amp;&amp;</span> <span class="nv">CUDA_HOME</span><span class="o">=</span>/usr/local/cuda ./reinstall
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>rm -f *.o ts
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c main.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c server.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c server_start.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c client.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c msgdump.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c jobs.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c execute.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c msg.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c mail.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c error.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c signals.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c list.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c print.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c info.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c env.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -c tail.c
+cc -pedantic -ansi -Wall -g -O0 -std=c11 -D_XOPEN_SOURCE=500 -D__STRICT_ANSI__ -L/usr/local/cuda/lib64 -I/usr/local/cuda/include -lpthread -c gpu.c
+In file included from <span class="ansi-bold">gpu.c:6:0</span>:
+<span class="ansi-bold">/usr/local/cuda/include/nvml.h:6208:51:</span> <span class="ansi-magenta-intense-fg ansi-bold">warning: </span>ISO C restricts enumerator values to range of ‘<span class="ansi-bold">int</span>’ [<span class="ansi-magenta-intense-fg ansi-bold">-Wpedantic</span>]
+     NVML_VGPU_COMPATIBILITY_LIMIT_OTHER         = <span class="ansi-magenta-intense-fg ansi-bold">0x80000000</span>,    //!&lt; Compatibility is limited by an undefined factor.
+                                                   <span class="ansi-magenta-intense-fg ansi-bold">^~~~~~~~~~</span>
+cc  -o ts main.o server.o server_start.o client.o msgdump.o jobs.o execute.o msg.o mail.o error.o signals.o list.o print.o info.o env.o tail.o gpu.o -L/usr/local/cuda/lib64 -L/usr/local/cuda/lib64/stubs -I/usr/local/cuda/include -lpthread -lcudart -lcublas -fopenmp -lnvidia-ml
+make: &#39;uninstall&#39; is up to date.
+install -c -d /usr/local/bin
+install -c ts /usr/local/bin
+install -c -d /usr/local/share/man/man1
+install -c -m 644 ts.1 /usr/local/share/man/man1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Basics-of-Task-Spooler">Basics of Task Spooler<a class="anchor-link" href="#Basics-of-Task-Spooler"> </a></h2><h3 id="First-look">First look<a class="anchor-link" href="#First-look"> </a></h3>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=0/1]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The interface of Task Spooler can be seen like above by simply executing <code>ts</code> without argument.
+In the figure above, <code>ID</code> refers to job ID.
+There are four main types of <code>State</code>: <code>running</code> indicates that a job is currently running,
+<code>queued</code> that a CPU job is waiting to be executed, <code>allocating</code> is a queued GPU job,
+and <code>running</code> means the job is currently being executed.
+When a job is executed, the <code>stdout</code> stream is redirected to a file under the <code>Output</code> tab.
+These log files will never automatically deleted even after the job list is cleared.
+<code>E-Level</code> captures and displays the return error of a process.
+<code>Time</code> indicates the running time of a job.
+The running command is shown in the <code>Command</code> column.
+The numbers inside the square bracket next to <code>Command</code> specify the number of currently running
+jobs and the maximum jobs (slots) that can be run in parallel.
+For example, in the figure above, there is no running job and you can run at most one job in 
+parallel, respectively.
+The maximum slot number can be adjusted manually.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Queuing-your-first-job">Queuing your first job<a class="anchor-link" href="#Queuing-your-first-job"> </a></h3><p>Jobs can be added by simply appending <code>ts</code> in front of your command.
+For e.g., to run make the system sleep for 10 seconds using Task Spooler, execute</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts sleep <span class="m">10</span>
+<span class="o">!</span>ts
+<span class="o">!</span>sleep <span class="m">10</span>  # lets check ts again after <span class="m">10</span> seconds
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0
+ID   State      Output               E-Level  Time   GPUs  Command [run=1/1]
+0    running    /tmp/ts-out.j0MGwO                   0     sleep 10
+ID   State      Output               E-Level  Time   GPUs  Command [run=0/1]
+0    finished   /tmp/ts-out.j0MGwO   0        10.00s 0     sleep 10
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can see that the first job with ID <code>0</code> is currently running, and
+the other job is being queued.
+After 10 seconds, the first job will finish with an <code>E-Level</code> of <code>0</code> and 
+the second job will start.</p>
+<p>To enable running more jobs in parallel, you can increase the maximum slot number by
+using a <code>-S</code> flag followed by the desired number.
+For instance,</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -S <span class="m">4</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=0/4]
+0    finished   /tmp/ts-out.j0MGwO   0        10.00s 0     sleep 10
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The command above allows you to run 4 jobs at the same time.
+You can verify by typing <code>ts</code> and the last number in the square bracket should change to <code>4</code>.
+Let's try queuing 5 jobs at once and this time we should increase the sleep time to 
+<code>100</code> so that the job doesn't end too fast.
+You should be able to see something like this</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts sleep <span class="m">20</span>
+<span class="o">!</span>ts sleep <span class="m">30</span>
+<span class="o">!</span>ts sleep <span class="m">40</span>
+<span class="o">!</span>ts sleep <span class="m">10</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>1
+2
+3
+4
+5
+ID   State      Output               E-Level  Time   GPUs  Command [run=4/4]
+1    running    /tmp/ts-out.xDq00e                   0     sleep 100
+2    running    /tmp/ts-out.HUzUai                   0     sleep 20
+3    running    /tmp/ts-out.sYcGno                   0     sleep 30
+4    running    /tmp/ts-out.ArV4nv                   0     sleep 40
+5    queued     (file)                               0     sleep 10
+0    finished   /tmp/ts-out.j0MGwO   0        10.00s 0     sleep 10
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Viewing-command-outputs">Viewing command outputs<a class="anchor-link" href="#Viewing-command-outputs"> </a></h3><p>As mentioned above, the <code>stdout</code> of the command is redirected to a file specified in the 
+<code>Output</code> column. 
+To manually see the written output, you can simply look for that file.
+But of course Task Spooler is more than that. It lets you read the outputs contents in two ways
+via the flags <code>-t</code> and <code>-c</code>.</p>
+<p><code>-c</code>, which stands for <code>cat</code>, allows you to see all the output from the beginning to the end.
+<code>-t</code>, which means <code>tail</code>, displays only the last 10 lines of the output.
+Let's try them out.
+First, we can something that can produce a lot of texts, like <code>ls</code>, <code>df</code> or <code>du</code>.
+The choice is yours.
+For me, I ran <code>ts ls /usr/bin</code>. The job ID of the command in my case is <code>0</code> so to visualize 
+the whole output, I used <code>ts -c 0</code>. It displayed a long list of excutable files.
+When I typed <code>ts -t 0</code>, it showed only the last 10 lines.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -K  # reset Task Spooler. it will be introduced later
+<span class="o">!</span>ts ls /usr/bin
+<span class="o">!</span>ts -t <span class="m">0</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Output" data-close="Show Output"></summary>
+        <p>
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0
+yes
+zdump
+zip
+zipcloak
+zipdetails
+zipgrep
+zipinfo
+zipnote
+zipsplit
+zrun
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+</p>
+    </details>
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%capture</span>
+
+<span class="err">!</span><span class="n">ts</span> <span class="o">-</span><span class="n">c</span> <span class="mi">0</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Miscs">Miscs<a class="anchor-link" href="#Miscs"> </a></h3><p>There are many other flag options to manage your tasks.
+First of all, to see all the available options, use a <code>-h</code> options.
+Among these, the ones you probably will use most are <code>-r</code>, <code>-C</code>, <code>-k</code>, <code>-T</code> and <code>-K</code>.
+To remove a queued or finished job (with <code>finished</code>, <code>queued</code> or <code>allocating</code> status), 
+use <code>-r</code> with optionally a job ID.
+For example, <code>ts -r</code> removes the last added job if it is not running yet.
+<code>ts -r 10</code> removes the job with ID <code>10</code>.
+If the job is successfully removed, it should disappear from the job list.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -K
+<span class="o">!</span>ts -S <span class="m">2</span>  # lets run <span class="m">2</span> tasks at a time
+<span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0
+1
+2
+ID   State      Output               E-Level  Time   GPUs  Command [run=2/2]
+0    running    /tmp/ts-out.gClvpl                   0     sleep 100
+1    running    /tmp/ts-out.rW9nIv                   0     sleep 100
+2    queued     (file)                               0     sleep 100
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -r <span class="m">2</span>  # remove job <span class="m">2</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=2/2]
+0    running    /tmp/ts-out.gClvpl                   0     sleep 100
+1    running    /tmp/ts-out.rW9nIv                   0     sleep 100
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To kill a running job, use <code>ts -k &lt;jobid&gt;</code>.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -k <span class="m">0</span>  # lets <span class="nb">kill</span> job <span class="m">0</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=1/2]
+1    running    /tmp/ts-out.rW9nIv                   0     sleep 100
+0    finished   /tmp/ts-out.gClvpl   -1        8.07s 0     sleep 100
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -S <span class="m">5</span>
+<span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>3
+4
+5
+ID   State      Output               E-Level  Time   GPUs  Command [run=4/5]
+1    running    /tmp/ts-out.rW9nIv                   0     sleep 100
+3    running    /tmp/ts-out.BeUKip                   0     sleep 100
+4    running    /tmp/ts-out.uFu50z                   0     sleep 100
+5    running    /tmp/ts-out.o0hd1F                   0     sleep 100
+0    finished   /tmp/ts-out.gClvpl   -1        8.07s 0     sleep 100
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To kill all running jobs, use <code>ts -T</code>.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -T  # terminates all running jobs
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=0/5]
+0    finished   /tmp/ts-out.gClvpl   -1        8.07s 0     sleep 100
+1    finished   /tmp/ts-out.rW9nIv   -1       22.42s 0     sleep 100
+5    finished   /tmp/ts-out.o0hd1F   -1        8.84s 0     sleep 100
+3    finished   /tmp/ts-out.BeUKip   -1        9.06s 0     sleep 100
+4    finished   /tmp/ts-out.uFu50z   -1        8.95s 0     sleep 100
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To clear all the <code>finished</code> jobs from the list, use <code>-C</code> without argument.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts -C  # clear job list
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>6
+ID   State      Output               E-Level  Time   GPUs  Command [run=1/5]
+6    running    /tmp/ts-out.bOY0Sx                   0     sleep 100
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, <code>ts -K</code> will kill the Task Spooler process.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -K  # lets <span class="nb">kill</span> Task Spooler
+<span class="o">!</span>ts  # <span class="k">then</span> restarts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=0/1]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are some useful flags when scheduling tasks as well.
+You may want to execute a task only after a certain job finishes.
+In this case you can use the flag <code>-d</code> with no argument to make your future task depend on
+the last added job, <code>-D</code> with a comma separated list of job IDs which are
+the IDs of the jobs that the to-be-run task depends on, and <code>-W</code> followed by a list of IDs, which states that the dependent job will run iff all the dependencies finish with exit code <code>0</code>.
+For example,</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -S <span class="m">10</span>
+<span class="c1"># lets queue 3 jobs first</span>
+<span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts sleep <span class="m">100</span>
+<span class="o">!</span>ts sleep <span class="m">200</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0
+1
+2
+ID   State      Output               E-Level  Time   GPUs  Command [run=3/10]
+0    running    /tmp/ts-out.1wh18P                   0     sleep 100
+1    running    /tmp/ts-out.aqr1P0                   0     sleep 100
+2    running    /tmp/ts-out.SLCGX7                   0     sleep 200
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -d sleep <span class="m">10</span>  # does not care about <span class="nb">exit</span> code
+<span class="o">!</span>ts -D <span class="m">0</span>,1,3 sleep <span class="m">10</span>  # runs after <span class="nb">jobs</span> <span class="m">0</span>, <span class="m">1</span> and <span class="m">3</span>
+<span class="o">!</span>ts -W <span class="m">0</span>,2,3 sleep <span class="m">10</span>  # to run this job, <span class="nb">jobs</span> <span class="m">0</span>, <span class="m">2</span> and <span class="m">3</span> need to finish well
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>3
+4
+5
+ID   State      Output               E-Level  Time   GPUs  Command [run=3/10]
+0    running    /tmp/ts-out.1wh18P                   0     sleep 100
+1    running    /tmp/ts-out.aqr1P0                   0     sleep 100
+2    running    /tmp/ts-out.SLCGX7                   0     sleep 200
+3    queued     (file)                               0     [2]&amp;&amp; sleep 10
+4    queued     (file)                               0     [0,1,3]&amp;&amp; sleep 10
+5    queued     (file)                               0     [0,2,3]&amp;&amp; sleep 10
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -k <span class="m">2</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=3/10]
+0    running    /tmp/ts-out.1wh18P                   0     sleep 100
+1    running    /tmp/ts-out.aqr1P0                   0     sleep 100
+3    running    /tmp/ts-out.suaN1K                   0     [2]&amp;&amp; sleep 10
+4    queued     (file)                               0     [0,1,3]&amp;&amp; sleep 10
+5    queued     (file)                               0     [0,2,3]&amp;&amp; sleep 10
+2    finished   /tmp/ts-out.SLCGX7   -1       10.35s 0     sleep 200
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>sleep <span class="m">100</span>  # let<span class="err">&#39;</span>s <span class="nb">wait</span> <span class="k">for</span> <span class="nb">jobs</span> <span class="m">0</span> and <span class="m">1</span> to finish
+<span class="o">!</span>ts  # you will see that the job queued with <span class="sb">`</span>-W<span class="sb">`</span> will be skipped
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=0/10]
+2    finished   /tmp/ts-out.SLCGX7   -1       10.35s 0     sleep 200
+3    finished   /tmp/ts-out.suaN1K   0        10.00s 0     [2]&amp;&amp; sleep 10
+0    finished   /tmp/ts-out.1wh18P   0         1.67m 0     sleep 100
+5    skipped    (no output)                          0     [0,2,3]&amp;&amp; sleep 10
+1    finished   /tmp/ts-out.aqr1P0   0         1.67m 0     sleep 100
+4    finished   /tmp/ts-out.yV8vfT   0        10.00s 0     [0,1,3]&amp;&amp; sleep 10
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To distinguish tasks, you can also label them using the <code>-L</code> flag.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -L foo sleep <span class="m">10</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>6
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=0/10]
+2    finished   /tmp/ts-out.SLCGX7   -1       10.35s 0     sleep 200
+3    finished   /tmp/ts-out.suaN1K   0        10.00s 0     [2]&amp;&amp; sleep 10
+0    finished   /tmp/ts-out.1wh18P   0         1.67m 0     sleep 100
+5    skipped    (no output)                          0     [0,2,7303014]&amp;&amp; sleep 10
+1    finished   /tmp/ts-out.aqr1P0   0         1.67m 0     sleep 100
+4    finished   /tmp/ts-out.yV8vfT   0        10.00s 0     [0,1,3]&amp;&amp; sleep 10
+6    finished   /tmp/ts-out.EO9Qct   0        10.00s 0     [foo]sleep 10
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="GPU-support">GPU support<a class="anchor-link" href="#GPU-support"> </a></h2><p>The <code>GPUs</code> column shows the number of GPUs that the task requires.</p>
+<p>Before, when running CPU tasks, the number of parallel tasks is capped by the 
+number of slots.
+For a GPU task, it is further restricted by the number of available GPUs.
+In other words, a GPU task can run only when there are enough both slots and GPUs.
+The availability of a GPU is determined by the free memory of that GPU.
+If more than 90% of the memory is available, the GPU is deemed to be free, and vice versa.
+If there are more free GPUs than required, the GPUs will be chosen auto-magically and randomly.</p>
+<p>There is one thing to note here. Because the availability of a GPU is determined by its
+memory usage, and it may take time for your task to initialize the GPU memory, so if you 
+run two tasks at the same time, they may use the same device and eventually may crash due to
+out-of-memory error.
+Therefore, in Task Spooler, I deliberately delay subsequent GPU tasks a short time 
+(30 seconds by default) after a GPU task is just executed.
+This is ugly, but it does the job.
+You can change this delay time via the flag <code>--set_gpu_wait</code> followed by the number of seconds.
+That's why when you execute several jobs at once, you may find the tasks after the first one 
+taking a long time to start execution.
+Also sometimes you may see the job status being changed to <code>running</code> but the task is not actually
+executed yet, and there is no output file. This is usual. Just keep waiting... It will be 
+executed soon (or sometimes not very soon, but anw it will run)!</p>
+<p>Now, to tell Task Spooler that your job requires GPU, use <code>-G</code> followed by the number of 
+required GPUs. Task Spooler will allocate the GPU(s) for the job, and it will make your job see
+only the provided GPU(s) so your task won't mess with the others.
+For a stupid example, let's sleep with 1 GPU. In your terminal, execute</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -K
+<span class="o">!</span>ts -G <span class="m">1</span> sleep <span class="m">1</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0
+ID   State      Output               E-Level  Time   GPUs  Command [run=1/1]
+0    running    /tmp/ts-out.N6RDHT                   1     sleep 1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you demand more GPUs than available, however, it will queue the task even though there are enough slots.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -G <span class="m">100</span> sleep <span class="m">1</span>
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>1
+ID   State      Output               E-Level  Time   GPUs  Command [run=0/1]
+1    allocating (file)                               100   sleep 1
+0    finished   /tmp/ts-out.N6RDHT   0         1.00s 1     sleep 1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the figure, I demanded 100 GPUs even though the server has only 1, and hence the task has
+to be queued (in this case, forever).</p>
+<p>We haven’t done anything useful yet. In the next section, let’s see how to manage your deep learning experiments using Task Spooler.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Deep-learning-with-Task-Spooler">Deep learning with Task Spooler<a class="anchor-link" href="#Deep-learning-with-Task-Spooler"> </a></h2><p>Let's train a Convolutional Neural Network (CNN) on MNIST.
+For this example, I will use the official <a href="https://github.com/pytorch/examples/blob/master/mnist/main.py">Pytorch MNIST example</a>.
+To enable the code to use muti-GPU, you will have to manually add</p>
+
+<pre><code>model = nn.DataParallel(model)</code></pre>
+<p>after line 124 (<code>optimizer = optim.Adadelta(model.parameters(), lr=args.lr)</code>).
+You can download the script by executing the cell below.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%capture</span>
+<span class="err">!</span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="nb">open</span><span class="o">-</span><span class="n">source</span><span class="o">-</span><span class="n">codes</span><span class="o">.</span><span class="n">s3</span><span class="o">.</span><span class="n">amazonaws</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">mnist</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To train the CNN with Task Spooler using 1 GPU, execute the script as usual in terminal 
+but with <code>ts -G 1</code> before <code>python</code>. The full command is</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts -K
+<span class="o">!</span>ts -G <span class="m">1</span> python mnist.py
+<span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0
+ID   State      Output               E-Level  Time   GPUs  Command [run=1/1]
+0    running    /tmp/ts-out.xwvuBP                   1     python mnist.py
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note that without the <code>-G</code> flag, the job will run on CPU instead.</p>
+<p>To see the output, use the <code>-c</code> or <code>-t</code> flag.
+You should see the training in real-time. You can use <code>ctrl+c</code> to stop getting stdout anytime without actually canceling the experiment.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%capture</span>
+<span class="err">!</span><span class="n">ts</span> <span class="o">-</span><span class="n">t</span> <span class="mi">0</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ts
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ID   State      Output               E-Level  Time   GPUs  Command [run=1/1]
+0    running    /tmp/ts-out.xwvuBP                   1     python mnist.py
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Unfortunately, there is only 1 GPU available in Colab, so I can't demonstrate training with multiple GPUs. You will have to trust me that it works!</p>
+<p>That's it folks. I hope this little app can boost your productivity and you will enjoy
+using it for not only your experiments but also your daily tasks.
+If you have any questions or want to contribute, feel free to create an issue
+or make a PR on the <a href="https://github.com/justanhduc/task-spooler">Github page</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="About-me">About me<a class="anchor-link" href="#About-me"> </a></h2><p>I am Duc Nguyen from Vietnam.
+Currently, I am a PhD candidate at Yonsei University, Korea.
+For more information about me,
+you guys can visit <a href="https://justanhduc.github.io/">my website</a> or contact me at
+<a href="mailto:adnguyen@yonsei.ac.kr">this email</a>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><a class="u-url" href="/blog/spooler/task%20manager/deep%20learning/2021/02/09/task-spooler.html" hidden></a>
+</article>
+<style>ol.bibliography li { list-style: none }</style>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>The organisation to empower the Computer Vision and Machine Learning community.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/librecv" title="librecv"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/cv_libre" title="cv_libre"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
