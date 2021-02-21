@@ -1,6 +1,6 @@
 /*-----------------------------------*/
 /*--- IMPORT STYLES FOR FASTPAGES ---*/
-@import "minima/fastpages-styles";   
+@import "minima/fastpages-styles";
 
 
 
@@ -8,4 +8,21 @@
 /*----- ADD YOUR STYLES BELOW -------*/
 
 // If you want to turn off dark background for syntax highlighting, comment or delete the below line.
-@import "minima/fastpages-dracula-highlight"; 
+/*
+@import "minima/fastpages-dracula-highlight";
+*/
+
+/* Based on https://github.com/muellerzr/fastblog/blob/bdf010dceb3e70ce9adf6980fb6982143a98fa64/_sass/minima/custom-styles.scss */
+
+.post-content p, .post-content li {
+   font-size: 125%;
+   color: #515151;
+}
+
+.post-content pre, .post-content code {
+        background-color: #ffe1e31f;
+}
+
+.post-content code {
+        padding: 0px 1px;
+}
